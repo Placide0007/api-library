@@ -7,10 +7,12 @@
 |
 */
 
+import { HttpContext } from '@adonisjs/core/http'
 import router from '@adonisjs/core/services/router'
 
-router.get('/', async () => {
-  return {
-    hello: 'world',
-  }
+router.get('/:name', async ({ request, response }: HttpContext) => {
+  const { name } = request.params()
+  return response.json({
+    name: name,
+  })
 })
