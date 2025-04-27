@@ -39,7 +39,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare updatedAt: DateTime | null
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
+ model-controller/user-and-request
 
   @hasMany(() => BookRequest)
   declare BookRequest: HasMany<typeof BookRequest>
 }
+
+}
+
+  
+
