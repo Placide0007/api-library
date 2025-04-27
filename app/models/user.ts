@@ -1,9 +1,12 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column , hasMany} from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import BookRequest from './book_request.js'
+
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -12,13 +15,19 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 
 export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true })
-  declare id: number
+  declare username: string
 
   @column()
-  declare fullName: string | null
+  declare lastname:string
 
   @column()
-  declare email: string
+  declare firstname:string
+
+  @column()
+  declare codage: number
+
+  @column()
+  declare role: 'student' | 'admin' | 'professor'
 
   @column({ serializeAs: null })
   declare password: string
@@ -30,4 +39,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare updatedAt: DateTime | null
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
+ model-controller/user-and-request
+
+  @hasMany(() => BookRequest)
+  declare BookRequest: HasMany<typeof BookRequest>
 }
+
+}
+
+  
+

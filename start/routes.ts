@@ -16,3 +16,7 @@ router.get('/:name', async ({ request, response }: HttpContext) => {
     name: name,
   })
 })
+
+router.group(() => {
+  router.resource('users','users_controller')
+}).prefix('/api')
