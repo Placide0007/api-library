@@ -42,4 +42,5 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => BookRequest)
   declare BookRequest: HasMany<typeof BookRequest>
+
 }
