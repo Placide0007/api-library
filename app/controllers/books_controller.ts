@@ -42,7 +42,7 @@ export default class BooksController {
 
     return response.status(200).json({
       message: 'Book Updated',
-      book: book,
+      book: book.refresh(),
     })
   }
 
