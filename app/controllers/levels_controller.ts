@@ -9,7 +9,7 @@ export default class LevelsController {
   }
 
   async show({ request, response }: HttpContext) {
-    const id = request.param('levelId', null)
+    const id = request.param('id', null)
 
     if (id === null) {
       return response.status(404).json({
@@ -17,7 +17,19 @@ export default class LevelsController {
       })
     }
 
-    return await Level.findOrFail(id)
+    let level: Level
+    try {
+      level = await Level.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'Level not found',
+      })
+    }
+
+    return response.status(200).json({
+      level: level,
+      books: await level.related('books').query().select('*'),
+    })
   }
 
   async store({ request, response }: HttpContext) {
@@ -34,7 +46,7 @@ export default class LevelsController {
   }
 
   async update({ request, response }: HttpContext) {
-    const id = request.param('levelId', null)
+    const id = request.param('id', null)
     const { name } = await request.validateUsing(StoreLevelValidator)
 
     if (id === null) {
@@ -43,7 +55,14 @@ export default class LevelsController {
       })
     }
 
-    const level = await Level.findOrFail(id)
+    let level: Level
+    try {
+      level = await Level.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'Level not found',
+      })
+    }
 
     level.name = name
 
@@ -56,7 +75,7 @@ export default class LevelsController {
   }
 
   async destroy({ request, response }: HttpContext) {
-    const id = request.param('levelId', null)
+    const id = request.param('id', null)
 
     if (id === null) {
       return response.status(404).json({
@@ -64,7 +83,14 @@ export default class LevelsController {
       })
     }
 
-    const level = await Level.findOrFail(id)
+    let level: Level
+    try {
+      level = await Level.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'Level not found',
+      })
+    }
 
     level.related('books').detach()
 

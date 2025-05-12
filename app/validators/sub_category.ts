@@ -9,7 +9,7 @@ export const StoreSubCategoryValidator = vine.compile(
 
 export const UpdateSubCategoryValidator = vine.compile(
   vine.object({
-    name: vine.string(),
-    categoryId: vine.number().exists({ table: 'categories', column: 'id' }).nullable(),
+    name: vine.string().optional(),
+    categoryId: vine.number().exists({ table: 'categories', column: 'id' }).optional(),
   })
 )

@@ -73,19 +73,19 @@ export default class BooksController {
       .related('categories')
       .query()
       .select('id')
-      .then((data) => data.flatMap((cat) => cat.id as number))
+      .then((data) => data?.flatMap((cat) => cat.id as number))
 
     const alreadyLinkedSubCategories: Number[] = await book
-      .related('categories')
+      .related('subCategories')
       .query()
       .select('id')
-      .then((data) => data.flatMap((cat) => cat.id as number))
+      .then((data) => data?.flatMap((cat) => cat.id as number))
 
     const alreadyLinkedLevels: Number[] = await book
-      .related('categories')
+      .related('levels')
       .query()
       .select('id')
-      .then((data) => data.flatMap((cat) => cat.id as number))
+      .then((data) => data?.flatMap((lev) => lev.id as number))
 
     if (categoriesId) {
       await book
