@@ -10,7 +10,7 @@ export default class SubCategoriesController {
   }
 
   async show({ request, response }: HttpContext) {
-    const id = request.param('subCategoryId', null)
+    const id = request.param('id', null)
 
     if (id === null) {
       return response.status(404).json({
@@ -18,19 +18,36 @@ export default class SubCategoriesController {
       })
     }
 
-    return await SubCategory.findOrFail(id)
+    let subCategory: SubCategory
+    try {
+      subCategory = await SubCategory.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'SubCategory not found',
+      })
+    }
+
+    return response.status(200).json({
+      subCategory,
+      books: await subCategory.related('books').query().select('*'),
+    })
   }
 
   async store({ request, response }: HttpContext) {
     const { name, categoryId } = await request.validateUsing(StoreSubCategoryValidator)
 
-    const subCategory = await SubCategory.create({
-      name: name,
+    let category: Category
+    try {
+      category = await Category.findOrFail(categoryId)
+    } catch (e) {
+      return response.status(422).json({
+        message: 'Bad request, invalid CategoryId',
+      })
+    }
+
+    const subCategory = await category.related('subCategories').create({
+      name,
     })
-
-    await subCategory.related('category').associate((await Category.find(categoryId)) as Category)
-
-    subCategory.save()
 
     return response.status(200).json({
       message: 'SubCategory Created',
@@ -39,7 +56,7 @@ export default class SubCategoriesController {
   }
 
   async destroy({ request, response }: HttpContext) {
-    const id = request.param('subCategoryId', null)
+    const id = request.param('id', null)
 
     if (id === null) {
       return response.status(404).json({
@@ -47,7 +64,14 @@ export default class SubCategoriesController {
       })
     }
 
-    const subCategory = await SubCategory.findOrFail(id)
+    let subCategory: SubCategory
+    try {
+      subCategory = await SubCategory.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'SubCategory not found',
+      })
+    }
 
     subCategory.related('books').detach()
     subCategory.delete()
@@ -58,8 +82,10 @@ export default class SubCategoriesController {
   }
 
   async update({ request, response }: HttpContext) {
-    const id = request.param('subCategoryId', null)
+    const id = request.param('id', null)
     const { name, categoryId } = await request.validateUsing(UpdateSubCategoryValidator)
+
+    if (name === undefined && categoryId === undefined) return response.status(201).json({})
 
     if (id === null) {
       return response.status(404).json({
@@ -67,9 +93,18 @@ export default class SubCategoriesController {
       })
     }
 
-    const subCategory = await SubCategory.findOrFail(id)
+    let subCategory: SubCategory
+    try {
+      subCategory = await SubCategory.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'SubCategory not found',
+      })
+    }
 
-    subCategory.name = name
+    if (name) {
+      subCategory.name = name
+    }
 
     if (categoryId)
       await subCategory.related('category').associate((await Category.find(categoryId)) as Category)

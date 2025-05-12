@@ -30,4 +30,7 @@ export default class SubCategory extends BaseModel {
     pivotTable: 'book_sub_category',
   })
   declare books: ManyToMany<typeof Book>
+
+  @column()
+  declare category_id: number
 }

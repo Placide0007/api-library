@@ -9,7 +9,7 @@
 
 const BooksController = () => import('#controllers/books_controller')
 const CategoriesController = () => import('#controllers/categories_controller')
-import { HttpContext } from '@adonisjs/core/http'
+const SubCategoriesController = () => import('#controllers/sub_categories_controller')
 import router from '@adonisjs/core/services/router'
 
 router
@@ -20,3 +20,4 @@ router
 
 router.resource('book', BooksController).apiOnly()
 router.resource('category', CategoriesController).apiOnly()
+router.resource('sub_category', SubCategoriesController).apiOnly()
