@@ -9,15 +9,20 @@ export default class BooksController {
   }
 
   async show({ request, response }: HttpContext) {
-    const bookId = request.param('bookId', null)
+    const bookId = request.param('id', null)
 
     if (bookId === null) {
       return response.status(404).json({
         messages: 'Book  not found',
       })
     }
-
-    return await Book.findByOrFail(bookId)
+    try {
+      return await Book.findOrFail(bookId)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'Book not found',
+      })
+    }
   }
 
   async store({ request, response }: HttpContext) {
@@ -43,11 +48,19 @@ export default class BooksController {
   }
 
   async update({ request, response }: HttpContext) {
-    const id = request.param('bookId', null)
+    const id = request.param('id', null)
+
     const { title, categoriesId, subCategoriesId, levelsId, description, path } =
       await request.validateUsing(UpdateBookValidator)
 
-    const book: Book = await Book.findOrFail(id)
+    let book: Book
+    try {
+      book = await Book.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'Book not found',
+      })
+    }
 
     updateLucidWithProxy<Book>(book, {
       title,
@@ -63,20 +76,25 @@ export default class BooksController {
 
     return response.status(200).json({
       message: 'Book Updated',
-      book: book.refresh(),
+      book: await book.refresh(),
     })
   }
 
   async destroy({ request, response }: HttpContext) {
-    const bookId = request.param('bookId', null)
+    const bookId = request.param('id', null)
 
     if (bookId) {
-      const book: Book = await Book.findOrFail(bookId)
-      book.delete()
-
-      return response.status(201).json({
-        message: 'Book deleted',
-      })
+      try {
+        const book: Book = await Book.findOrFail(bookId)
+        book.delete()
+        return response.status(201).json({
+          message: 'Book deleted',
+        })
+      } catch (e) {
+        return response.status(404).json({
+          message: 'Book not found',
+        })
+      }
     }
 
     return response.status(404).json({

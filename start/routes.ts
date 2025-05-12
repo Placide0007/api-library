@@ -7,6 +7,7 @@
 |
 */
 
+const BooksController = () => import('#controllers/books_controller')
 import { HttpContext } from '@adonisjs/core/http'
 import router from '@adonisjs/core/services/router'
 
@@ -17,6 +18,10 @@ router.get('/:name', async ({ request, response }: HttpContext) => {
   })
 })
 
-router.group(() => {
-  router.resource('users','users_controller')
-}).prefix('/api')
+router
+  .group(() => {
+    router.resource('users', 'users_controller')
+  })
+  .prefix('/api')
+
+router.resource('book', BooksController).apiOnly()
