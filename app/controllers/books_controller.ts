@@ -34,6 +34,8 @@ export default class BooksController {
     if (subCategoriesId) await book.related('subCategories').attach(subCategoriesId)
     if (levelsId) await book.related('levels').attach(levelsId)
 
+    await book.save()
+
     return response.status(200).json({
       message: 'Book created',
       book: book,

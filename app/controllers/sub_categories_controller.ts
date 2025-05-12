@@ -1,7 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
 import SubCategory from '#models/sub_category'
-import { StoreSubCategoryValidator } from '#validators/sub_category'
+import { StoreSubCategoryValidator, UpdateSubCategoryValidator } from '#validators/sub_category'
+import Category from '#models/category'
 
 export default class SubCategoriesController {
   async index() {
@@ -21,11 +22,15 @@ export default class SubCategoriesController {
   }
 
   async store({ request, response }: HttpContext) {
-    const { name } = await request.validateUsing(StoreSubCategoryValidator)
+    const { name, categoryId } = await request.validateUsing(StoreSubCategoryValidator)
 
-    const subCategory = SubCategory.create({
+    const subCategory = await SubCategory.create({
       name: name,
     })
+
+    await subCategory.related('category').associate((await Category.find(categoryId)) as Category)
+
+    subCategory.save()
 
     return response.status(200).json({
       message: 'SubCategory Created',
@@ -44,6 +49,7 @@ export default class SubCategoriesController {
 
     const subCategory = await SubCategory.findOrFail(id)
 
+    subCategory.related('books').detach()
     subCategory.delete()
 
     return response.status(201).json({
@@ -53,7 +59,7 @@ export default class SubCategoriesController {
 
   async update({ request, response }: HttpContext) {
     const id = request.param('subCategoryId', null)
-    const { name } = await request.validateUsing(StoreSubCategoryValidator)
+    const { name, categoryId } = await request.validateUsing(UpdateSubCategoryValidator)
 
     if (id === null) {
       return response.status(404).json({
@@ -64,6 +70,9 @@ export default class SubCategoriesController {
     const subCategory = await SubCategory.findOrFail(id)
 
     subCategory.name = name
+
+    if (categoryId)
+      await subCategory.related('category').associate((await Category.find(categoryId)) as Category)
 
     await subCategory.save()
 

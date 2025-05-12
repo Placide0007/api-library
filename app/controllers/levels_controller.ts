@@ -66,6 +66,8 @@ export default class LevelsController {
 
     const level = await Level.findOrFail(id)
 
+    level.related('books').detach()
+
     await level.delete()
 
     return response.status(201).json({

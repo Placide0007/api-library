@@ -17,7 +17,7 @@ export default class SubCategory extends BaseModel {
   @belongsTo(() => Category, {
     foreignKey: 'category_id',
   })
-  declare cateroy: BelongsTo<typeof Category>
+  declare category: BelongsTo<typeof Category>
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime

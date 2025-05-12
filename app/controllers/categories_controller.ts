@@ -28,7 +28,11 @@ export default class CategoriesController {
       })
     }
 
-    return await Category.findOrFail(id)
+    const category = await Category.findOrFail(id)
+    return response.status(200).json({
+      category,
+      books: category.books.values(),
+    })
   }
 
   async destroy({ request, response }: HttpContext) {
@@ -42,6 +46,7 @@ export default class CategoriesController {
 
     const category = await Category.findOrFail(id)
 
+    category.related('books').detach()
     category.delete()
 
     return response.status(201).json({
