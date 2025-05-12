@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
 import Category from './category.js'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import Book from './book.js'
 
 export default class SubCategory extends BaseModel {
   @column({ isPrimary: true })
@@ -20,4 +21,13 @@ export default class SubCategory extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+
+  @manyToMany(() => Book, {
+    localKey: 'id',
+    pivotForeignKey: 'sub_category_id',
+    relatedKey: 'id',
+    pivotRelatedForeignKey: 'book_id',
+    pivotTable: 'book_sub_category',
+  })
+  declare books: ManyToMany<typeof Book>
 }
