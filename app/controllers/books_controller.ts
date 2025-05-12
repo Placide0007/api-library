@@ -2,6 +2,7 @@ import Book from '#models/book'
 import { StoreBookValidator, UpdateBookValidator } from '#validators/book'
 import type { HttpContext } from '@adonisjs/core/http'
 import { updateLucidWithProxy } from '../utilities/functions/update_lucid_object.js'
+import { afterDelete } from '@adonisjs/lucid/orm'
 
 export default class BooksController {
   async index() {
@@ -43,7 +44,7 @@ export default class BooksController {
 
     return response.status(200).json({
       message: 'Book created',
-      book: book,
+      book: await book.refresh(),
     })
   }
 
@@ -68,10 +69,41 @@ export default class BooksController {
       path,
     })
 
-    if (categoriesId) await book.related('categories').attach(categoriesId)
-    if (subCategoriesId) await book.related('subCategories').attach(subCategoriesId)
-    if (levelsId) await book.related('levels').attach(levelsId)
+    const alreadyLinkedCategories: Number[] = await book
+      .related('categories')
+      .query()
+      .select('id')
+      .then((data) => data.flatMap((cat) => cat.id as number))
 
+    const alreadyLinkedSubCategories: Number[] = await book
+      .related('categories')
+      .query()
+      .select('id')
+      .then((data) => data.flatMap((cat) => cat.id as number))
+
+    const alreadyLinkedLevels: Number[] = await book
+      .related('categories')
+      .query()
+      .select('id')
+      .then((data) => data.flatMap((cat) => cat.id as number))
+
+    if (categoriesId) {
+      await book
+        .related('categories')
+        .attach(categoriesId.filter((catId) => !alreadyLinkedCategories.includes(catId)))
+    }
+    if (subCategoriesId) {
+      await book
+        .related('subCategories')
+        .attach(
+          subCategoriesId.filter((subCatId) => !alreadyLinkedSubCategories.includes(subCatId))
+        )
+    }
+    if (levelsId) {
+      await book
+        .related('levels')
+        .attach(levelsId.filter((levId) => !alreadyLinkedLevels.includes(levId)))
+    }
     await book.save()
 
     return response.status(200).json({
