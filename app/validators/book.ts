@@ -8,11 +8,16 @@ export const StoreBookValidator = vine.compile(
     title: vine.string().maxLength(255),
     categoriesId: vine
       .array(vine.number().exists({ table: 'categories', column: 'id' }))
-      .nullable(),
+      .nullable()
+      .optional(),
     subCategoriesId: vine
       .array(vine.number().exists({ table: 'sub_categories', column: 'id' }))
-      .nullable(),
-    levelsId: vine.array(vine.number().exists({ table: 'levels', column: 'id' })).nullable(),
+      .nullable()
+      .optional(),
+    levelsId: vine
+      .array(vine.number().exists({ table: 'levels', column: 'id' }))
+      .nullable()
+      .optional(),
     description: vine.string(),
     path: vine.string(),
   })
@@ -26,11 +31,16 @@ export const UpdateBookValidator = vine.compile(
     title: vine.string().optional(),
     categoriesId: vine
       .array(vine.number().exists({ table: 'categories', column: 'id' }))
-      .nullable(),
+      .nullable()
+      .optional(),
     subCategoriesId: vine
       .array(vine.number().exists({ table: 'sub_categories', column: 'id' }))
-      .nullable(),
-    levelsId: vine.array(vine.number().exists({ table: 'levels', column: 'id' })).nullable(),
+      .nullable()
+      .optional(),
+    levelsId: vine
+      .array(vine.number().exists({ table: 'levels', column: 'id' }))
+      .nullable()
+      .optional(),
     description: vine.string().optional(),
     path: vine.string().optional(),
   })

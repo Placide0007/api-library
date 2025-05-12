@@ -2,6 +2,7 @@ import Category from '#models/category'
 import { StoreCategoryValidator, UpdateCategoryValidator } from '#validators/categorie'
 import type { HttpContext } from '@adonisjs/core/http'
 import { updateLucidWithProxy } from '../utilities/functions/update_lucid_object.js'
+import { messages } from '@vinejs/vine/defaults'
 
 export default class CategoriesController {
   async index() {
@@ -10,7 +11,7 @@ export default class CategoriesController {
 
   async store({ request, response }: HttpContext) {
     const { name } = await request.validateUsing(StoreCategoryValidator)
-    const category = Category.create({
+    const category = await Category.create({
       name: name,
     })
     return response.status(200).json({
@@ -20,7 +21,7 @@ export default class CategoriesController {
   }
 
   async show({ request, response }: HttpContext) {
-    const id = request.param('categoryId', null)
+    const id = request.param('id', null)
 
     if (id === null) {
       return response.status(404).json({
@@ -28,15 +29,23 @@ export default class CategoriesController {
       })
     }
 
-    const category = await Category.findOrFail(id)
+    let category: Category
+    try {
+      category = await Category.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'Category not found',
+      })
+    }
+
     return response.status(200).json({
       category,
-      books: category.books.values(),
+      books: await category.related('books').query().select('*'),
     })
   }
 
   async destroy({ request, response }: HttpContext) {
-    const id = request.param('categoryId', null)
+    const id = request.param('id', null)
 
     if (id === null) {
       return response.status(404).json({
@@ -44,7 +53,14 @@ export default class CategoriesController {
       })
     }
 
-    const category = await Category.findOrFail(id)
+    let category: Category
+    try {
+      category = await Category.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        messages: 'Category not found',
+      })
+    }
 
     category.related('books').detach()
     category.delete()
@@ -55,7 +71,7 @@ export default class CategoriesController {
   }
 
   async update({ request, response }: HttpContext) {
-    const id = request.param('categoryId', null)
+    const id = request.param('id', null)
     const { name } = await request.validateUsing(UpdateCategoryValidator)
 
     if (id === null) {
@@ -64,7 +80,15 @@ export default class CategoriesController {
       })
     }
 
-    const category = await Category.findOrFail(id)
+    let category: Category
+
+    try {
+      category = await Category.findOrFail(id)
+    } catch (e) {
+      return response.status(404).json({
+        message: 'Category not found',
+      })
+    }
 
     updateLucidWithProxy(category, { name })
 
