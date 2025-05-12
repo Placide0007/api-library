@@ -1,5 +1,4 @@
 import Category from '#models/category'
-import { UpdateBookValidator } from '#validators/book'
 import { StoreCategoryValidator, UpdateCategoryValidator } from '#validators/categorie'
 import type { HttpContext } from '@adonisjs/core/http'
 import { updateLucidWithProxy } from '../utilities/functions/update_lucid_object.js'
@@ -29,7 +28,11 @@ export default class CategoriesController {
       })
     }
 
-    return await Category.findOrFail(id)
+    const category = await Category.findOrFail(id)
+    return response.status(200).json({
+      category,
+      books: category.books.values(),
+    })
   }
 
   async destroy({ request, response }: HttpContext) {
@@ -43,6 +46,7 @@ export default class CategoriesController {
 
     const category = await Category.findOrFail(id)
 
+    category.related('books').detach()
     category.delete()
 
     return response.status(201).json({
@@ -61,13 +65,14 @@ export default class CategoriesController {
     }
 
     const category = await Category.findOrFail(id)
+
     updateLucidWithProxy(category, { name })
 
     await category.save()
 
     return response.status(201).json({
       message: 'Category Updated',
-      category: category.refresh(),
+      category: await category.refresh(),
     })
   }
 }

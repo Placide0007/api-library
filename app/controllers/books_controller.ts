@@ -21,9 +21,20 @@ export default class BooksController {
   }
 
   async store({ request, response }: HttpContext) {
-    const payload = await request.validateUsing(StoreBookValidator)
+    const { title, categoriesId, subCategoriesId, levelsId, description, path } =
+      await request.validateUsing(StoreBookValidator)
 
-    const book = await Book.create(payload)
+    const book = await Book.create({
+      title,
+      description,
+      path,
+    })
+
+    if (categoriesId) await book.related('categories').attach(categoriesId)
+    if (subCategoriesId) await book.related('subCategories').attach(subCategoriesId)
+    if (levelsId) await book.related('levels').attach(levelsId)
+
+    await book.save()
 
     return response.status(200).json({
       message: 'Book created',
@@ -32,11 +43,21 @@ export default class BooksController {
   }
 
   async update({ request, response }: HttpContext) {
-    const payload = await request.validateUsing(UpdateBookValidator)
+    const id = request.param('bookId', null)
+    const { title, categoriesId, subCategoriesId, levelsId, description, path } =
+      await request.validateUsing(UpdateBookValidator)
 
-    const book: Book = await Book.findOrFail(payload.id)
+    const book: Book = await Book.findOrFail(id)
 
-    updateLucidWithProxy<Book>(book, payload)
+    updateLucidWithProxy<Book>(book, {
+      title,
+      description,
+      path,
+    })
+
+    if (categoriesId) await book.related('categories').attach(categoriesId)
+    if (subCategoriesId) await book.related('subCategories').attach(subCategoriesId)
+    if (levelsId) await book.related('levels').attach(levelsId)
 
     await book.save()
 

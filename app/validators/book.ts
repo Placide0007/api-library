@@ -6,6 +6,13 @@ import vine from '@vinejs/vine'
 export const StoreBookValidator = vine.compile(
   vine.object({
     title: vine.string().maxLength(255),
+    categoriesId: vine
+      .array(vine.number().exists({ table: 'categories', column: 'id' }))
+      .nullable(),
+    subCategoriesId: vine
+      .array(vine.number().exists({ table: 'sub_categories', column: 'id' }))
+      .nullable(),
+    levelsId: vine.array(vine.number().exists({ table: 'levels', column: 'id' })).nullable(),
     description: vine.string(),
     path: vine.string(),
   })
@@ -16,8 +23,14 @@ export const StoreBookValidator = vine.compile(
  */
 export const UpdateBookValidator = vine.compile(
   vine.object({
-    id: vine.number().exists({ table: 'books', column: 'id' }),
     title: vine.string().optional(),
+    categoriesId: vine
+      .array(vine.number().exists({ table: 'categories', column: 'id' }))
+      .nullable(),
+    subCategoriesId: vine
+      .array(vine.number().exists({ table: 'sub_categories', column: 'id' }))
+      .nullable(),
+    levelsId: vine.array(vine.number().exists({ table: 'levels', column: 'id' })).nullable(),
     description: vine.string().optional(),
     path: vine.string().optional(),
   })
