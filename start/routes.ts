@@ -7,14 +7,16 @@
 |
 */
 
+import { HttpContext } from '@adonisjs/core/http'
 import router from '@adonisjs/core/services/router'
 import UsersController from '#controllers/users_controller'
 
 
-router.get('/', async () => {
-  return {
-    hello: 'world',
-  }
+router.get('/:name', async ({ request, response }: HttpContext) => {
+  const { name } = request.params()
+  return response.json({
+    name: name,
+  })
 })
 
 router.group(() => {

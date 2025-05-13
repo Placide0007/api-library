@@ -44,3 +44,10 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare BookRequest: HasMany<typeof BookRequest>
 
 }
+
+
+
+
+  
+
+
