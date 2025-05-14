@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('title').notNullable()
       table.text('description').notNullable()
+      table.enum('status', ['pending' , 'approved' , 'rejected']).notNullable().defaultTo('pending');
       table.string('username').references('users.username').onDelete('CASCADE')
       table.timestamp('created_at')
       table.timestamp('updated_at')

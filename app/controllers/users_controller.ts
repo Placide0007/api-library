@@ -24,7 +24,7 @@ export default class UsersController {
     payload.password = await hash.make(payload.password)
     const user = await User.create(payload)
     return response.status(200).json({
-      message : 'utilisateur creer avec succès',
+      message : 'utilisateur cree avec succès',
       user:user,
     })
   }
@@ -49,7 +49,9 @@ export default class UsersController {
     const data = request.only(['firstname','lastname','role'])
     user.merge(data)
     await user.save()
-    return response.status(200).json({messages:'informations modifiées avec succèes'})
+    return response.status(200).json({
+      messages:'informations modifiées avec succèes'
+    })
   }
 
   /**
@@ -58,7 +60,9 @@ export default class UsersController {
   async destroy({ params , response }: HttpContext) {
     const user = await User.findByOrFail(params.username)
     await user.delete()
-    return response.status(200).json({message:'utilisateur supprimer avec succès'})
+    return response.status(200).json({
+      message:'utilisateur supprimer avec succès'
+    })
   }
 }
 
