@@ -14,17 +14,11 @@ const LevelsController = () => import('#controllers/levels_controller')
 import router from '@adonisjs/core/services/router'
 import UsersController from '#controllers/users_controller'
 import BookRequest from '#models/book_request'
-
-
-router
-  .group(() => {
-    router.resource('users', 'users_controller')
-  })
-  .prefix('/api')
-
+import BookRequestResponse from '#models/book_request_response'
 
 router.group(() => {
   router.resource('users',UsersController ).apiOnly()
+  router.resource('bookRequestResponse',BookRequestResponse ).apiOnly()
   router.resource('bookrequests',BookRequest).apiOnly()
   router.resource('book', BooksController).apiOnly()
   router.resource('category', CategoriesController).apiOnly()
