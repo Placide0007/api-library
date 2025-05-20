@@ -6,6 +6,7 @@ import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import BookRequest from './book_request.js'
+import BookRequestResponse from './book_request_response.js'
 
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
@@ -42,6 +43,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => BookRequest)
   declare BookRequest: HasMany<typeof BookRequest>
+
+  @hasMany(() => BookRequestResponse)
+  declare BookRequestResponse: HasMany<typeof BookRequestResponse>
 
 }
 

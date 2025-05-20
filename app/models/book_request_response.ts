@@ -1,32 +1,31 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column , belongsTo , hasMany} from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import BookRequest from './book_request.js'
 import User from './user.js'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
-import BookRequestResponse from './book_request_response.js'
 
-export default class BookRequest extends BaseModel {
+export default class BookRequestResponse extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare title:string
+  declare message:string
 
-  @column()
+  @column()  
   declare status: 'pending' | 'approved' | 'rejected'
-
-  @column()
-  declare description:string 
-
+  
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
-  
+
+  @belongsTo(() => BookRequest)
+  declare BookRequest: BelongsTo<typeof BookRequest>
+
   @belongsTo(() => User)
   declare User: BelongsTo<typeof User>
 
-  @hasMany(() => BookRequestResponse)
-  declare BookRequestResponse: HasMany<typeof BookRequestResponse>
+
+
 }
